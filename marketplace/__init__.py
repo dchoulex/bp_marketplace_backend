@@ -29,6 +29,19 @@ def create_app():
 
     db.init_app(app)
 
+    with app.app_context():
+        db.create_all()
+
+      
+        with open('init_table.sql', 'r') as sql_file:
+            sql_statements = sql_file.read()
+            
+        for statement in sql_statements.split(';'):
+            if statement.strip():
+                db.session.execute(text(statement))
+        db.session.commit()
+
+    
     app.config.from_mapping(
         SECRET_KEY=app.config.get('SECRET_KEY'),
     )
