@@ -13,6 +13,8 @@ from .models.db import db
 
 from marketplace import error_handling
 
+from init_table import init_table
+
 def create_app():
     load_dotenv()
 
@@ -29,6 +31,7 @@ def create_app():
 
     db.init_app(app)
 
+    init_table()
     with app.app_context():
         db.create_all()
 
@@ -40,6 +43,14 @@ def create_app():
             if statement.strip():
                 db.session.execute(text(statement))
         db.session.commit()
+        
+        with open('init_products.sql', 'r') as sql_file2:
+            sql_statements = sql_file2.read()
+        for statement in sql_statements.split(';'):
+            if statement.strip():
+                db.session.execute(text(statement))
+        db.session.commit()
+        
 
     
     app.config.from_mapping(
